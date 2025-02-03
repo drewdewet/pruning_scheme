@@ -1,0 +1,30 @@
+score canes individually - brute force best combo
+
+GBDT to score or classify resultant vine struture ( may have to classify as 1 or 0 if only have annotations of 1 chosen scheme)
+Fetures:
+for each sides bearer:
+    diameter, orientation feats, length, position feats, internode length, node count
+original cane count of plant
+spur features if spurring
+relative position and orientation of bearers
+
+
+
+CURRENT TRY:
+GBDT to select a bearer seperately on each side, can use rules to get best candidates first to even class distributions slightly
+Features for that cane
+
+
+Code:
+    - Cane feature extractor
+    - Candidates finder, given a vine score the best n on a side
+    - Dataset generator, for each vine for each side add selected cane and its features and n-1 unselected and their features
+    - model, GBDT model or simlar to predict if branch selected
+    - label plant, puts candidates for each side into model and finds most strogly classified cane
+
+Pitfall - a cane selected on one vine may not be on another, model needs to know what the other options were
+possible solution - normalise features among canes on side of vine first
+possible solution - add features for rank among candidates for different metrics or overall heuristic score, maybe just for certain features
+possible solution - if selected always in top 5 or so canes could stack all candidates into model in order and classify between 5 classes
+
+

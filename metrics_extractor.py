@@ -112,21 +112,43 @@ class CaneMetricsExtractor:
     # total amount of nodes along cane that could support new growth
     def node_count(self):
         return len(self.nodes)
+    
+    # get parent type of cane
+    def parent_type(self):
+        cane_id = self.cane_data.name
+        root_part = self.vine_data.parts
 
+        def check_parent(part):
+            children_ids = [child.name for child in part.children]
+            if cane_id in children_ids:
+                return part.class_name
+            for child in part.children:
+                result = check_parent(child)
+                if result is not None:
+                    return result
+        parent_type = check_parent(root_part)
 
-    def get_cane_metrics(self, cane_data):
+        return parent_type
+        
+
+    def get_cane_metrics(self, cane_data, vine_data):
         self.cane_data = cane_data
+        self.vine_data = vine_data
+        # print(list(self.cane_data.keys()))
 
         self.sort_nodes()
-        
-        diameter = self.diameter()
-        orientation = self.orientation()
-        length = self.length()
-        pos_below_wire = self.position_rel_wire()
-        internode_lengh = self.internode_length()
-        node_count = self.node_count()
+        metrics = {}
 
-        return (diameter,orientation,length,pos_below_wire,internode_lengh,node_count)
+        
+        metrics['diameter'] = self.diameter()
+        metrics['orientation'] = self.orientation()
+        metrics['length'] = self.length()
+        metrics['pos_below_wire'] = self.position_rel_wire()
+        metrics['internode_lengh'] = self.internode_length()
+        metrics['node_count'] = self.node_count()
+        metrics['parent_type'] = self.parent_type()
+
+        return metrics
 
 
 

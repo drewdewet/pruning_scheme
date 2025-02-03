@@ -5,35 +5,36 @@ import itertools
 import random
 import json
 
+
 class Cane:
     def __init__(self, cane_data, metrics):
         self.metrics = metrics
         self.cane_data = cane_data
 
-    # very bad scoring system
-    def generate_score(self):
-        m = self.metrics
+    # # very bad scoring system
+    # def generate_score(self):
+    #     m = self.metrics
 
-        # diameter 0.005 is 0 and 0.01 is 1
-        d_score = (m[0] - 0.005) / 0.005
+    #     # diameter 0.005 is 0 and 0.01 is 1
+    #     d_score = (m[0] - 0.005) / 0.005
 
-        # unsure how to use orientation
+    #     # unsure how to use orientation
 
-        # length binary around 0.9
-        l_score = int(m[2] >= 0.9)
+    #     # length binary around 0.9
+    #     l_score = int(m[2] >= 0.9)
 
-        # further below wire the better, normed with approx max
-        p_score = -m[3] / 0.5
+    #     # further below wire the better, normed with approx max
+    #     p_score = -m[3] / 0.5
 
-        # unuse best internode length
+    #     # unuse best internode length
 
-        # guess the more nodes the better, normed with approx max
-        n_score = m[5] / 25
+    #     # guess the more nodes the better, normed with approx max
+    #     n_score = m[5] / 25
 
-        # assume equal weighting to metrics
-        score = d_score + l_score + p_score + n_score
+    #     # assume equal weighting to metrics
+    #     score = d_score + l_score + p_score + n_score
 
-        self.score = score
+    #     self.score = score
 
 
 
@@ -50,10 +51,10 @@ class Vine:
         
     def extract_metrics(self, extractor):
         for cane in self.canes_data_list:
-            self.canes[cane.name] = Cane(cane, extractor.get_cane_metrics(cane))
+            self.canes[cane.name] = Cane(cane, extractor.get_cane_metrics(cane, self.vine_data))
             
         # for cane in self.canes.values():
-            # print(cane.metrics)
+        #     print(cane.metrics)
             
 
     def score_canes(self):
@@ -69,28 +70,28 @@ class Vine:
         
     
 
-    def generate_pruning_schemes(self):
-        # for top 8 scored canes get pairs of bearers as Cane objects
+    # def generate_pruning_schemes(self):
+    #     # for top 8 scored canes get pairs of bearers as Cane objects
 
-        # choose spurs?
+    #     # choose spurs?
 
-        # find bearer cut points
+    #     # find bearer cut points
 
-        # return dict with 'prune', 'spur', 'bearer_1', 'bearer_2' labels for every part (future version)
-        # (and Cane objects for new bearers?)
+    #     # return dict with 'prune', 'spur', 'bearer_1', 'bearer_2' labels for every part (future version)
+    #     # (and Cane objects for new bearers?)
 
-        # either need a rule based approach or labelled data and a ML algorithm such as gradient boosted decision trees
+    #     # either need a rule based approach or labelled data and a ML algorithm such as gradient boosted decision trees
 
-        canes = list(self.canes.values())
-        candidate_canes = sorted(canes, key=lambda cane: cane.score, reverse=True)[:8]
-        candidate_ids = [cane.cane_data.name for cane in candidate_canes]
+    #     canes = list(self.canes.values())
+    #     candidate_canes = sorted(canes, key=lambda cane: cane.score, reverse=True)[:8]
+    #     candidate_ids = [cane.cane_data.name for cane in candidate_canes]
 
-        bearer_combos = list(itertools.combinations(candidate_ids, 2))
+    #     bearer_combos = list(itertools.combinations(candidate_ids, 2))
 
-        for combo in bearer_combos:
-            spur = random.choice([c for c in candidate_ids if c not in combo])
+    #     for combo in bearer_combos:
+    #         spur = random.choice([c for c in candidate_ids if c not in combo])
             
-            self.pruning_schemes.append({'bearers':combo, 'spurs':[spur]})
+    #         self.pruning_schemes.append({'bearers':combo, 'spurs':[spur]})
 
 
 def main():
@@ -126,7 +127,7 @@ def main():
         vine.extract_metrics(extractor)
 
         # generate a score for each cane
-        vine.score_canes()
+        # vine.score_canes()
 
         # get labelled pruning scheme from file
         vine_annotations_file = "/csse/users/abd42/p-drive/2023/vines_pruning/" + vine_name + ".json"

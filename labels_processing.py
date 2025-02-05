@@ -6,6 +6,8 @@ for annotations.json from Kevin
 
 import json
 from pathlib import Path
+from process_vine import Vine
+import metrics_extractor
 
 class Annotations():
     def __init__(self, annotations_file):
@@ -57,26 +59,16 @@ def main():
     annos.bearer_counts()
 
 
-
 def individual_annotations():
     model_directory = Path("/csse/users/abd42/p-drive/2023/vines_pruning/")
     
+    all_vines = []
     for vine_file in model_directory.iterdir():
         if vine_file.is_file() and vine_file.suffix == ".json":
-            pass
+            vine = Vine(vine_file)
 
-def main2():
-    file = "/csse/users/abd42/Downloads/annotations (2).json"
-    with open(file, 'r') as f:
-        annos = json.load(f)
-
-    names = []
-    for a in annos:
-        names.append(a["vine"]["file_name"])
-    print(names)
-    print(len(names))
-    print(len(set(names)))
-
+            extractor = metrics_extractor.CaneMetricsExtractor()
+            vine.extract_metrics(extractor)
 
 if __name__ == "__main__":
-    main2()
+    main()

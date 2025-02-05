@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from tree_parts import flatten_parts
+
 # from mpl_toolkits.mplot3d import Axes3D
 
 # def plot_3d_points(points, highlight_points=None):
@@ -55,6 +59,8 @@ class CaneMetricsExtractor:
         nodes = [node for node, _ in sorted(nodes, key=lambda pair: pair[1])]
         nodes = nodes[::2]
         self.nodes = [(node, closest_point(cane_data.spine.points, node.spine.points[0])) for node in nodes]
+
+        return len(self.nodes) > 3
     
     # mesured between second and third nodes (buds)
     def diameter(self):
@@ -94,8 +100,11 @@ class CaneMetricsExtractor:
 
     # (would also think distance horizontally from head may be a factor)
     def position_horzontaly(self):
-        return self.cane_data.spine.points[0][1]
-    
+        trunk = next((p for p in flatten_parts(self.vine_data.parts) if p.get("class_name") == "Trunk"), None)
+        head_pos = trunk.spine.points[-1]
+        dy =  (self.cane_data.spine.points[0][1] - head_pos[1])
+        return dy
+
     # not using currently
     def health(self):
         pass
@@ -136,21 +145,31 @@ class CaneMetricsExtractor:
         self.vine_data = vine_data
         # print(list(self.cane_data.keys()))
 
-        self.sort_nodes()
-        metrics = {}
-
+        valid = self.sort_nodes()
+        if not valid:
+            return None
         
+        metrics = {}
         metrics['diameter'] = self.diameter()
         metrics['orientation'] = self.orientation()
         metrics['length'] = self.length()
         metrics['pos_below_wire'] = self.position_rel_wire()
-        metrics['internode_lengh'] = self.internode_length()
+        metrics['pos_horizontal'] = self.position_horzontaly()
+        metrics['internode_length'] = self.internode_length()
         metrics['node_count'] = self.node_count()
         metrics['parent_type'] = self.parent_type()
 
         return metrics
-
-
+    
+    # for a set of canes return normalised metrics
+    def normalise_metrics(self, metrics_list):
+        scaler = StandardScaler()
+        df = pd.DataFrame(metrics_list)
+        norm_cols = ["diameter", "length", "internode_length", "node_count"]
+        for col in norm_cols:
+            name = col + "_norm"
+            df[name] = scaler.fit_transform(df[[col]])
+        return df.to_dict('records')
 
 # data forms with 
 # name, children, spine, class_name, (meshes)

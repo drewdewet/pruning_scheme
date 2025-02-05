@@ -51,11 +51,14 @@ class Vine:
         
     def extract_metrics(self, extractor):
         for cane in self.canes_data_list:
-            self.canes[cane.name] = Cane(cane, extractor.get_cane_metrics(cane, self.vine_data))
-            
-        # for cane in self.canes.values():
-        #     print(cane.metrics)
-            
+            metrics_c = extractor.get_cane_metrics(cane, self.vine_data)
+            if metrics_c:
+                self.canes[cane.name] = Cane(cane, metrics_c)
+
+        normed_metrics = extractor.normalise_metrics([c.metrics for c in self.canes.values()])               
+        for i, cane in enumerate(self.canes.values()):
+            cane.metrics = normed_metrics[i]
+
 
     def score_canes(self):
         for cane in list(self.canes.values()):
@@ -127,7 +130,7 @@ def main():
         vine.extract_metrics(extractor)
 
         # generate a score for each cane
-        # vine.score_canes()
+        vine.score_canes()
 
         # get labelled pruning scheme from file
         vine_annotations_file = "/csse/users/abd42/p-drive/2023/vines_pruning/" + vine_name + ".json"

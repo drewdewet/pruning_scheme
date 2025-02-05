@@ -2,6 +2,7 @@ from process_vine import Vine
 import metrics_extractor
 from enum import Enum
 from pathlib import Path
+import json
 
 """Based on scoring both sides seperately"""
 
@@ -9,23 +10,41 @@ class Side(Enum):
     LEFT = 0
     RIGHT = 1
 
-def scorer(metrics, side):
-    x = metrics['length']
-    """
-    probably higher weight:
-    closeness to an ideal location horizontally ~10 cm to side of head
-    closeness to an ideal location vertically x cm below wire
+def scorer(m, side):
+    """scoring scheme calculating penalties based on distance from meaan values from chosen vines in annotated data"""
+    
+    # WEIGHTS, could be learned to maximise performance on labeled data
+    w_hd = 1
+    w_vd = 1
+    w_d = 1
+    w_l = 1
+    w_il = 1
+    w_n = 1
+    
+    # POSITION VARS
+    if side == Side.RIGHT: # pssitive y val to right
+        x_hd = w_hd * abs(m["pos_horizontal"] - 0.096) # 0.096 is mean abs value of pos horizontal
+    else:
+        x_hd = w_hd * abs(m["pos_horizontal"] + 0.096)
 
-    probably medium weight:
-    length
-    diameter
-    internode length
-    node count
-    rads from an ideal orientation at base
-    rads from an ideal orientation whole cane
-    """
+    x_vd = w_vd * abs(m["pos_below_wire"] - 0.194)
 
-    return x
+    # CANE VARS, based on z score normalised per vine cane metrics to allow comparison between vines
+    x_d = w_d * abs(m["diameter_norm"] - 0.139)
+
+    x_l = w_l * abs(m["length_norm"] - 0.286)
+
+    x_il = w_il * abs(m["internode_length_norm"] - 0.538)
+
+    x_n = w_n * abs(m["node_count_norm"] + 0.179)
+
+    # ORIENTATION, distance from the average orientation of canes on each side at based and along length
+
+    # PARENT, could have bonus for coming from trunk / spur etc?
+
+    score = -(x_hd + x_vd + x_d + x_l + x_il + x_n)
+    return score
+
 
 
 def best_n_on_side(vine:Vine, side, n):
@@ -36,37 +55,8 @@ def best_n_on_side(vine:Vine, side, n):
 
 
 
-
 def main():
-    # vine_name = "vine_A1_0"
-    # vine_file = "/csse/users/abd42/p-drive/2023/vines_pruning/" + vine_name + ".tree"
-
-    # model_directory = Path("/uc/research/CropVision/synthetic_tree_assets/trees3/descriptions")
-    model_directory = Path("/csse/users/abd42/p-drive/2023/vines_pruning/")
-
-    for vine_file in model_directory.iterdir():
-        if vine_file.is_file() and vine_file.suffix == ".tree":
-            print(vine_file)
-            vine = Vine(vine_file)
-
-            extractor = metrics_extractor.CaneMetricsExtractor()
-            vine.extract_metrics(extractor)
-
-            side = Side.LEFT
-            n = 5
-            left_candidates = best_n_on_side(vine, side, n)
-
-            for c in left_candidates:
-                print(c.metrics)
-            # print(left_candidates)
-            input('c')
-
-
-    # will need functionality to compare candidates ranking to real labels
-        # basic is generate candidates for each vine and query percent with real as candidate
-
-
-    # must also always have actual selection in candidates when data set generated
+    pass
 
 
 

@@ -11,32 +11,6 @@ class Cane:
         self.metrics = metrics
         self.cane_data = cane_data
 
-    # # very bad scoring system
-    # def generate_score(self):
-    #     m = self.metrics
-
-    #     # diameter 0.005 is 0 and 0.01 is 1
-    #     d_score = (m[0] - 0.005) / 0.005
-
-    #     # unsure how to use orientation
-
-    #     # length binary around 0.9
-    #     l_score = int(m[2] >= 0.9)
-
-    #     # further below wire the better, normed with approx max
-    #     p_score = -m[3] / 0.5
-
-    #     # unuse best internode length
-
-    #     # guess the more nodes the better, normed with approx max
-    #     n_score = m[5] / 25
-
-    #     # assume equal weighting to metrics
-    #     score = d_score + l_score + p_score + n_score
-
-    #     self.score = score
-
-
 
 class Vine:
     def __init__(self, vine_file):

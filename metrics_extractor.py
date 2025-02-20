@@ -71,7 +71,7 @@ class CaneMetricsExtractor:
         return float(2*radius)
 
     # in the front facing yz plane (maybe relevant what it is in other planes too?)
-    # necessary for which cnes more able to go left or right as bearers 
+    # necessary for which canes more able to go left or right as bearers 
     # (may be more factors like very initial direction versus whole cane orientation and angle with part it sprouts from?)
     def orientation(self):
         # using angle between base of cane and position of first node
@@ -171,6 +171,3 @@ class CaneMetricsExtractor:
             df[name] = scaler.fit_transform(df[[col]])
         return df.to_dict('records')
 
-# data forms with 
-# name, children, spine, class_name, (meshes)
-# spine -> radius (array of floats), points (array of xyz points), length

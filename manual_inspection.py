@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from process_vine import Vine
 import metrics_extractor
+import matplotlib.pyplot as plt
 
 def main():
     # for each annotation load vine, record metrics of all canes and chosen canes
@@ -43,19 +44,7 @@ def main():
     
     # analyse stats
     cane_df = pd.DataFrame(rows)
-    print(cane_df.shape)
-    print(cane_df.head(15))
-    print(cane_df.info())
-    print(cane_df.describe())
-
     chosen_df = cane_df[cane_df['chosen']]
-    print(chosen_df.shape)
-    # print(chosen_df.head(15))
-    # print(chosen_df.info())
-    print(chosen_df.describe())
-
-    print(chosen_df["plant_id"].nunique())
-    print(chosen_df["plant_id"].value_counts())
 
     cane_df.to_csv("cane_df.csv", index=False)
     chosen_df.to_csv("chosen_df.csv", index=False)
@@ -64,6 +53,15 @@ def main():
 def main2():
     cane_df = pd.read_csv("cane_df.csv")
     chosen_df = pd.read_csv("chosen_df.csv")
+
+    # cane_df = cane_df[cane_df['side'] == 0]
+    chosen_df = chosen_df[chosen_df['side'] == 0]
+
+    cane_df['orientation'].hist(density=True)
+    # plt.show()
+    chosen_df['orientation'].hist(density=True)
+    plt.show()
+    input('c')
 
     good_users = ['saxtonv','olafschelezki', 'OlafsAnnotations']
     cane_df = cane_df[cane_df['user'].isin(good_users)]
@@ -76,7 +74,7 @@ def main2():
 
     chosen_df = cane_df[cane_df['chosen']]
     print(chosen_df.shape)
-    print(chosen_df.head(15))
+    # print(chosen_df.head(15))
     # print(chosen_df.info())
     print(chosen_df.describe())
 
@@ -85,6 +83,10 @@ def main2():
     print(chosen_df["user"].nunique())
     print(chosen_df["user"].value_counts())
 
+    left_df = chosen_df[chosen_df['side'] == 0]
+    right_df = chosen_df[chosen_df['side'] == 1]
+    print(left_df.describe())
+    print(right_df.describe())
 
 
 if __name__ == "__main__":
